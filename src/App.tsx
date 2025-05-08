@@ -1,32 +1,36 @@
 import React, { useState } from 'react';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
-import { FaHeart } from 'react-icons/fa';
 import DialogueBox from './components/DialogueBox';
-import CharacterIcon from './components/CharacterIcon';
-import Confetti from 'react-confetti';
-// You'll create this component for your actual surprise:
-// import SurpriseComponent from './components/SurpriseComponent';
+import DecorativeElements from './components/DecorativeElements';
 
+// Keep gradientAnimation for potential subtle movement if desired, or remove if too busy
 const gradientAnimation = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% { background-position: 0% 0%; }
+  50% { background-position: 10% 10%; } /* Subtle shift */
+  100% { background-position: 0% 0%; }
 `;
 
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #1a1a2e; // Fallback
-    color: #e0e0e0;
+    font-family: 'Krub', sans-serif;
+    /* Purple Grid Background */
+    --grid-color: rgba(255, 255, 255, 0.07); /* Lighter lines for subtlety */
+    --grid-size: 25px; /* Adjust for desired grid density */
+    --base-purple: #4a0072; /* Darker purple base like the image */
+
+    background-color: var(--base-purple);
+    background-image:
+      linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+    
+    color: #e0e0e0; /* Default text color, adjust as needed */
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(-45deg, #232a44, #2f3c68, #3c4c88, #4a5aa0);
-    background-size: 400% 400%;
-    animation: ${gradientAnimation} 18s ease infinite;
-    overflow-x: hidden; // Prevent horizontal scrollbar from gradient
+    overflow: hidden; /* Important to prevent scrollbars from off-screen elements */
   }
 
   * {
@@ -34,6 +38,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+// Minor tweak to AppContainer if needed for z-indexing with the new body::before
 const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -43,72 +48,27 @@ const AppContainer = styled.div`
   padding: 20px;
   width: 100%;
   text-align: center;
-`;
-
-const GridBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    linear-gradient(#6b4c93 1px, transparent 1px),
-    linear-gradient(90deg, #6b4c93 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.2;
-  z-index: 1;
-`;
-
-const FloatingHeart = styled(FaHeart)`
-  position: absolute;
-  color: #e94560;
-  animation: float 3s ease-in-out infinite;
-  opacity: 0.6;
-  z-index: 2;
-
-  @keyframes float {
-    0% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(180deg); }
-    100% { transform: translateY(0) rotate(360deg); }
-  }
-`;
-
-const CharacterContainer = styled.div`
-  position: absolute;
-  width: 100%;
-  top: 20px;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 3;
-`;
-
-const ContentContainer = styled.div`
   position: relative;
-  z-index: 3;
-  width: 100%;
-  max-width: 800px;
-  padding: 20px;
+  z-index: 2; /* Ensure main content is above decorative elements if they have z-index 1 */
 `;
 
 const ProgressBarContainer = styled.div`
   width: 80%;
   max-width: 500px;
   height: 20px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque for visibility */
   border-radius: 10px;
   margin-bottom: 30px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
 const ProgressBarFill = styled.div<{ progress: number }>`
   width: ${props => props.progress}%;
   height: 100%;
-  background-color: #e94560;
+  background-color: #ff7bac; /* Pink to match hearts */
   border-radius: 8px 0 0 8px;
   transition: width 0.5s ease-in-out;
-  text-align: right;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -118,27 +78,25 @@ const ProgressText = styled.span`
   padding-right: 5px;
   color: white;
   font-size: 0.8rem;
-  font-family: 'Press Start 2P', cursive;
+  font-family: 'Press Start 2P', cursive; /* Keeping this for the retro touch here */
 `;
 
-
-// Placeholder for your actual surprise component
 const SurprisePlaceholder = styled.div`
   padding: 30px 40px;
-  background-color: rgba(42, 27, 61, 0.95);
-  border: 4px solid #6b4c93;
+  background-color: rgba(255, 240, 245, 0.9); /* LavenderBlush background */
+  border: 3px solid #ff7bac; /* Pink border */
   border-radius: 12px;
-  color: #fff;
+  color: #333; /* Darker text for readability on light background */
   font-family: 'Press Start 2P', cursive;
   text-align: center;
-  box-shadow: 0 0 25px rgba(107, 76, 147, 0.5);
+  box-shadow: 0 0 20px rgba(255, 123, 172, 0.4); /* Pink shadow */
   animation: ${keyframes`
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
   `} 0.7s ease-out;
 
   h2 {
-    color: #ffcc00; // A celebratory gold
+    color: #ff69b4; /* Hot Pink title */
     font-size: 1.8rem;
     margin-bottom: 20px;
   }
@@ -151,7 +109,6 @@ const SurprisePlaceholder = styled.div`
 function App() {
   const [progress, setProgress] = useState(0);
   const [dialogueComplete, setDialogueComplete] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   const handleDialogueProgress = (newProgress: number) => {
     setProgress(newProgress);
@@ -159,36 +116,13 @@ function App() {
 
   const handleDialogueComplete = () => {
     setDialogueComplete(true);
-    setShowConfetti(true);
   };
-
-  // Generate random floating hearts
-  const hearts = Array.from({ length: 10 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    delay: `${Math.random() * 3}s`
-  }));
 
   return (
     <>
       <GlobalStyle />
+      <DecorativeElements />
       <AppContainer>
-        <GridBackground />
-        {hearts.map(heart => (
-          <FloatingHeart
-            key={heart.id}
-            style={{
-              left: heart.left,
-              top: heart.top,
-              animationDelay: heart.delay
-            }}
-          />
-        ))}
-        <CharacterContainer>
-          <CharacterIcon position="left" />
-          <CharacterIcon position="right" />
-        </CharacterContainer>
         {!dialogueComplete ? (
           <>
             <ProgressBarContainer>
@@ -196,23 +130,18 @@ function App() {
                 {progress > 10 && <ProgressText>{Math.round(progress)}%</ProgressText>}
               </ProgressBarFill>
             </ProgressBarContainer>
-            <ContentContainer>
-              <DialogueBox
-                onProgress={handleDialogueProgress}
-                onComplete={handleDialogueComplete}
-              />
-            </ContentContainer>
+            <DialogueBox
+              onProgress={handleDialogueProgress}
+              onComplete={handleDialogueComplete}
+            />
           </>
         ) : (
           <SurprisePlaceholder>
-            <h2>🎉 Hooray! 🎉</h2>
-            <p>The dialogue is complete!</p>
-            <p>This is where your amazing surprise content will appear.</p>
-            <p>Consider adding a photo slideshow, a video, or a special interactive element here!</p>
-            {/* Example: <YourSurpriseComponent /> */}
+            <h2>💖 Yay! 💖</h2>
+            <p>You've reached the end!</p>
+            <p>Time for your special surprise...</p>
           </SurprisePlaceholder>
         )}
-        {showConfetti && <Confetti />}
       </AppContainer>
     </>
   );
