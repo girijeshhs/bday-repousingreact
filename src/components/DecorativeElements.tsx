@@ -1,61 +1,73 @@
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaHeart } from 'react-icons/fa';
 
-const float = keyframes`
-  0% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-20px) scale(1.1); }
-  100% { transform: translateY(0) scale(1); }
+const heartShower = keyframes`
+  0% {
+    transform: translateY(-10vh) rotate(0deg); // Start above screen
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(110vh) rotate(30deg); // End below screen, with a slight rotation
+    opacity: 0.3;
+  }
 `;
 
-const Container = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 1;
-`;
-
-const FloatingHeart = styled(FaHeart)<{
+const HeartIcon = styled(FaHeart)<{
   left: string;
-  top: string;
+  animationDuration: string;
+  animationDelay: string;
   size: string;
-  delay: string;
 }>`
-  position: absolute;
-  color: #ff7bac; /* Changed to a vibrant pink */
-  opacity: 0.7;
+  position: fixed;
+  top: 0; // Initial top position, animation handles the Y movement
   left: ${props => props.left};
-  top: ${props => props.top};
+  color: #ff7bac; // Pink color for hearts
   font-size: ${props => props.size};
-  animation: ${float} 3.5s ease-in-out infinite;
-  animation-delay: ${props => props.delay};
-  filter: drop-shadow(0 2px 8px rgba(100, 80, 200, 0.18));
+  opacity: 0; // Start invisible, animation handles fade-in
+  animation: ${heartShower} ${props => props.animationDuration} linear ${props => props.animationDelay} infinite;
+  z-index: 1; // Ensure they are in the background
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 `;
 
-const DecorativeElements = () => {
-  // Increase the number of floating hearts
-  const hearts = Array.from({ length: 30 }, (_, i) => ({ // Changed from 10 to 30
-    id: i,
-    left: `${Math.random() * 90 + 2}%`,
-    top: `${Math.random() * 80 + 5}%`,
-    size: `${Math.random() * 18 + 18}px`, // You can also adjust size range if needed
-    delay: `${Math.random() * 3}s`, // Slightly increased max delay for more variation
-  }));
+interface HeartDetail {
+  id: number;
+  left: string;
+  animationDuration: string;
+  animationDelay: string;
+  size: string;
+}
+
+const DecorativeElements: React.FC = () => {
+  const [hearts, setHearts] = useState<HeartDetail[]>([]);
+  const numHearts = 20; // Adjust number of hearts
+
+  useEffect(() => {
+    const newHearts: HeartDetail[] = [];
+    for (let i = 0; i < numHearts; i++) {
+      newHearts.push({
+        id: i,
+        left: `${Math.random() * 100}vw`,
+        animationDuration: `${Math.random() * 5 + 8}s`, // Slower: 8 to 13 seconds duration
+        animationDelay: `${Math.random() * 10}s`, // Staggered start times up to 10s
+        size: `${Math.random() * 1 + 0.8}rem`, // Sizes between 0.8rem and 1.8rem
+      });
+    }
+    setHearts(newHearts);
+  }, []);
 
   return (
-    <Container>
+    <>
       {hearts.map(heart => (
-        <FloatingHeart
+        <HeartIcon
           key={heart.id}
           left={heart.left}
-          top={heart.top}
+          animationDuration={heart.animationDuration}
+          animationDelay={heart.animationDelay}
           size={heart.size}
-          delay={heart.delay}
         />
       ))}
-    </Container>
+    </>
   );
 };
 

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import DialogueBox from './components/DialogueBox';
-import DecorativeElements from './components/DecorativeElements';
+import DecorativeElements from './components/DecorativeElements'; // Your floating hearts (react-icons)
+import FloatingMessages from './components/FloatingMessages';   // RE-ENABLING: Your floating text messages
+// import FloatingShapes from './components/FloatingShapes';   // REMOVED: The floating CSS shapes
+import ConfettiEffect from './components/ConfettiEffect';   // Assuming you have this for later
+import TitleBanner from './components/TitleBanner'; // Import the new banner
 
 // Keep gradientAnimation for potential subtle movement if desired, or remove if too busy
 const gradientAnimation = keyframes`
@@ -49,7 +53,7 @@ const AppContainer = styled.div`
   width: 100%;
   text-align: center;
   position: relative;
-  z-index: 2; /* Ensure main content is above decorative elements if they have z-index 1 */
+  z-index: 10; /* Ensure dialogue box is above floating elements */
 `;
 
 const ProgressBarContainer = styled.div`
@@ -109,22 +113,36 @@ const SurprisePlaceholder = styled.div`
 function App() {
   const [progress, setProgress] = useState(0);
   const [dialogueComplete, setDialogueComplete] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false); // For confetti effect
 
   const handleDialogueProgress = (newProgress: number) => {
     setProgress(newProgress);
   };
 
+  const triggerConfetti = () => {
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 5000); 
+  };
+
   const handleDialogueComplete = () => {
     setDialogueComplete(true);
+    triggerConfetti(); // Example: trigger confetti on completion
   };
+
+  const yourGirlfriendsName = "Emma"; // <<< REPLACE 'Emma' WITH THE ACTUAL NAME
 
   return (
     <>
       <GlobalStyle />
-      <DecorativeElements />
+      <DecorativeElements /> {/* Your floating react-icon hearts */}
+      <FloatingMessages />   {/* RE-ENABLING: Your floating text messages */}
+      {/* <FloatingShapes /> */}     {/* REMOVED: Your floating CSS shapes */}
+      <ConfettiEffect isActive={showConfetti} style={{ zIndex: 100 }} />
+
       <AppContainer>
         {!dialogueComplete ? (
           <>
+            <TitleBanner name={yourGirlfriendsName} /> {/* Banner added here */}
             <ProgressBarContainer>
               <ProgressBarFill progress={progress}>
                 {progress > 10 && <ProgressText>{Math.round(progress)}%</ProgressText>}
@@ -136,11 +154,14 @@ function App() {
             />
           </>
         ) : (
-          <SurprisePlaceholder>
-            <h2>💖 Yay! 💖</h2>
-            <p>You've reached the end!</p>
-            <p>Time for your special surprise...</p>
-          </SurprisePlaceholder>
+          <>
+            <TitleBanner name={yourGirlfriendsName} /> {/* Also show on completion screen */}
+            <SurprisePlaceholder>
+              <h2>💖 Yay! 💖</h2>
+              <p>You've reached the end!</p>
+              <p>Time for your special surprise...</p>
+            </SurprisePlaceholder>
+          </>
         )}
       </AppContainer>
     </>
