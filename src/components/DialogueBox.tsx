@@ -131,12 +131,27 @@ const DialogueContainer = styled.div`
   font-family: 'Press Start 2P', cursive;
   text-align: center;
   box-shadow: 0 0 20px rgba(107, 76, 147, 0.3);
+  max-width: 90%; // Ensure it's responsive
+  width: 600px; // Max width for larger screens
+  margin: 0 auto; // Center it if AppContainer doesn't fully handle
+`;
+
+const textFadeInAnimation = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
 const DialogueText = styled.p`
   font-size: 1.2rem;
   margin-bottom: 20px;
   line-height: 1.6;
+  animation: ${textFadeInAnimation} 0.6s ease-out forwards;
 `;
 
 const ChoiceButton = styled.button`
@@ -205,15 +220,16 @@ const DialogueBox: React.FC<DialogueBoxProps> = ({ onProgress, onComplete }) => 
   const handleChoice = (nextStep: number) => {
     if (nextStep === -1) {
       setIsFinished(true);
-      onProgress(100);
+      onProgress(100); // Ensure progress hits 100%
     } else {
       setCurrentStep(nextStep);
-      onProgress((nextStep / (dialogueSteps.length - 1)) * 100);
+      // dialogueSteps.length - 1 because the last item is the "end" trigger, not a displayable step for progress calc this way
+      onProgress(((nextStep) / (dialogueSteps.length - 1)) * 100); 
     }
   };
 
   const handleComplete = () => {
-    setIsFinished(false);
+    // setIsFinished(false); // Not needed, App.tsx will unmount/hide DialogueBox
     onComplete();
   };
 
@@ -236,7 +252,8 @@ const DialogueBox: React.FC<DialogueBoxProps> = ({ onProgress, onComplete }) => 
 
   return (
     <DialogueContainer>
-      <DialogueText>{dialogueSteps[currentStep].text}</DialogueText>
+      {/* Add key={currentStep} to DialogueText to re-trigger animation on change */}
+      <DialogueText key={currentStep}>{dialogueSteps[currentStep].text}</DialogueText>
       <ButtonContainer>
         {dialogueSteps[currentStep].choices.map((choice, index) => (
           <ChoiceButton
